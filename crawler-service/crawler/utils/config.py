@@ -1,0 +1,5 @@
+KAFKA_HOST = "kafka"
+KAFKA_PORT = 9092
+
+REDIS_HOST = "redis"
+REDIS_PORT = 6379

@@ -1,0 +1,29 @@
+💡 Đây là cách thủ công để chạy một file Spark Python (.py) bên trong container Spark, sử dụng thêm gói phụ trợ để xử lý dữ liệu Kafka.
+
+🔍 Giải thích từng dòng:
+🔹 docker exec -it spark bash
+docker exec: chạy lệnh trong một container đang chạy
+-it: bật chế độ tương tác (interactive + tty)
+spark: là tên container bạn chỉ định (đã đặt trong docker-compose.yml)
+bash: mở một shell để tương tác
+🟰 Bạn đang đăng nhập vào container Spark, giống như SSH vào 1 server.
+
+🔹 cd /opt/spark-apps
+Bạn chuyển vào thư mục chứa mã nguồn bạn đã mount từ máy host (config ở docker-compose.yml):
+volumes:
+  - ./processor-service:/opt/spark-apps
+
+🔹 spark-submit ... spark_news_processor.py
+Đây là lệnh quan trọng nhất: chạy một ứng dụng Spark.
+Cụ thể:
+spark-submit \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3,org.elasticsearch:elasticsearch-spark-30_2.12:8.11.1 \
+  spark_news_processor.py
+✅ Các phần chính:
+Thành phần	Ý nghĩa
+spark-submit	Lệnh khởi chạy job Spark
+--packages ...	Tự động tải thêm JAR cần thiết từ Maven
+spark-sql-kafka-0-10_2.12	Connector Spark ↔ Kafka
+kafka-clients	Thư viện Kafka client (để gửi/nhận message)
+spark_news_processor.py	Script xử lý stream từ Kafka topic raw-news
+📌 Spark sẽ tải JAR này vào runtime nếu chưa có và liên kết các thư viện cần thiết.
