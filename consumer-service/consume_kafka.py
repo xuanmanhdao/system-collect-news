@@ -4,7 +4,7 @@ import json
 def consume():
     consumer = KafkaConsumer(
         'raw-news',
-        bootstrap_servers=['localhost:9092'],
+        bootstrap_servers=['localhos:9093'],
         auto_offset_reset='earliest',  # đọc từ đầu topic
         enable_auto_commit=True,
         group_id='crawler-monitor-group',

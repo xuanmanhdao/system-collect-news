@@ -10,7 +10,7 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     healthcheck:
-      test: ["CMD", "echo ruok | nc localhost 2181"]
+      test: ["CMD-SHELL", "echo ruok > /dev/tcp/localhost/2181; sleep 1; exit 0"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -20,15 +20,18 @@ services:
     image: bitnami/kafka:3.4.0-debian-11-r0
     container_name: kafka
     ports:
-      - "9092:9092"
+      - "9092:9092"  # Cổng cho PLAINTEXT (nội bộ Docker)
+      - "9093:9093"  # Cổng cho EXTERNAL (truy cập từ host hoặc bên ngoài)
     environment:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9093
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LOG4J_LOGGERS=kafka=DEBUG  # Bật debug log
+      - KAFKA_CFG_MESSAGE_MAX_BYTES=2097152  # Hỗ trợ message 2MB
     depends_on:
       zookeeper:
         condition: service_healthy

@@ -11,7 +11,7 @@ spark.sparkContext.setLogLevel("WARN")
 
 # 2. Đọc dữ liệu từ Kafka
 df_kafka_raw = spark.readStream.format("kafka") \
-    .option("kafka.bootstrap.servers", "kafka:9093") \
+    .option("kafka.bootstrap.servers", "kafka:9092") \
     .option("subscribe", "raw-news") \
     .option("startingOffsets", "earliest") \
     .option("checkpointLocation", "/tmp/checkpoint-news") \
