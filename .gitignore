@@ -1,0 +1,34 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore Scrapy cache
+.scrapy/
+.scrapy/httpcache/
+.scrapy/logs/
+
+# Ignore virtual environments
+venv/
+env/
+.venv/
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# Ignore Docker artifacts
+*.log
+*.pid
+docker-compose.override.yml
+*.bak
+
+# Ignore system files
+.DS_Store
+Thumbs.db
