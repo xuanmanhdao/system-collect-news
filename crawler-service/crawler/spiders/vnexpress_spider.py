@@ -2,20 +2,13 @@ import scrapy
 import hashlib
 from crawler.utils.redis_client import RedisClient
 from crawler.utils.kafka_producer import send_to_kafka, KafkaProducerSingleton
-import logging
 import time
+import json
 
 class VnexpressSpider(scrapy.Spider):
     name = "vnexpress"
     allowed_domains = ["vnexpress.net"]
     start_urls = ["https://vnexpress.net"]
-    custom_settings = {
-        'LOG_LEVEL': 'DEBUG', # Bật debug log
-        'CONCURRENT_REQUESTS': 16, # Giới hạn request đồng thời
-        'DOWNLOAD_DELAY': 1, # Thêm delay để tránh tải nặng server
-        'RETRY_TIMES': 3, # Retry request thất bại
-        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -65,6 +58,9 @@ class VnexpressSpider(scrapy.Spider):
                     "image": image,
                     "body": body
                 }
+
+                message_size = len(json.dumps(article_data).encode('utf-8'))
+                self.logger.info(f"[SPIDER] Message size: {message_size} bytes for {response.url}")
 
                 # Gửi bất đồng bộ tới Kafka
                 self.logger.debug(f"[SPIDER] Sending article to Kafka: {response.url}")

@@ -28,7 +28,7 @@ class KafkaProducerSingleton:
                         bootstrap_servers=[f"{KAFKA_HOST}:{KAFKA_PORT}"],
                         value_serializer=lambda v: json.dumps(v).encode('utf-8'),
                         retries=5,
-                        request_timeout_ms=30000,
+                        request_timeout_ms=10000,
                         acks='all',
                         linger_ms=50,
                         batch_size=131072,
@@ -129,8 +129,8 @@ def send_to_kafka(topic, data, callback=None, error_callback=None, num_partition
             future.add_callback(callback or (lambda rm: logger.debug(f"[KAFKA] Sent to {topic}: {rm}")))
             future.add_errback(error_callback or (lambda exc: logger.error(f"[KAFKA] Error sending to {topic}: {exc}", exc_info=True)))
         else:
-            future.get(timeout=30)
-            logger.info(f"[KAFKA] Sent to {topic} in {time.time() - start_time:.3f}s")
+            # future.get(timeout=30)
+            logger.info(f"[KAFKA] Sent to not callback {topic} in {time.time() - start_time:.3f}s")
 
     except KafkaTimeoutError as e:
         logger.error(f"[KAFKA] Timeout sending to {topic}: {e}", exc_info=True)

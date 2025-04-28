@@ -29,7 +29,7 @@ class RedisClient:
                     port=port,
                     decode_responses=decode_responses,
                     socket_timeout=socket_timeout,
-                    max_connections=10  # Giới hạn số kết nối trong pool
+                    max_connections=50  # Giới hạn số kết nối trong pool
                 )
                 # Tạo Redis client từ pool
                 self.client = redis.Redis(connection_pool=self.pool)

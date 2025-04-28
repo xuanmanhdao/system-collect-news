@@ -1,0 +1,19 @@
+Date: Mon, 28 Apr 2025 09:10:46 GMT
+Content-Type: text/html; charset=utf-8
+Vary: Accept-Encoding
+V-Cache: VNE4
+Cache-Control: private, max-age=0, no-cache, no-store
+Server: vne-vn-fe-lv1-6
+X-Zone: hn
+X-Idc: fpt
+X-Proxy-Cache: HIT
+Nxc1: HIT 4
+X-Content-Type-Options: nosniff
+X-Xss-Protection: 1; mode=block
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: upgrade-insecure-requests; default-src data: 'unsafe-inline' 'unsafe-eval' https:; script-src data: 'unsafe-inline' 'unsafe-eval' https: blob: https://www.googleanalytics.com https://www.google-analytics.com https://www.googleoptimize.com https://optimize.google.com ; style-src data: 'unsafe-inline' https: https://optimize.google.com https://fonts.googleapis.com; img-src data: https: blob: android-webview-video-poster: https://www.google-analytics.com https://www.googletagmanager.com https://optimize.google.com; font-src data: https: https://fonts.gstatic.com; connect-src https: wss: blob:; media-src data: https: blob:; object-src https:; child-src https: data: blob:; form-action https:; frame-ancestors https://*.vnexpress.net https://vnexpress.net
+Referrer-Policy: strict-origin-when-cross-origin
+Content-Encoding: gzip
+Alt-Svc: h3=":443"; ma=86400
+X-Time: 9
