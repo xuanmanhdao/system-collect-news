@@ -27,14 +27,14 @@ echo "✅ Kafka is healthy!"
 
 # --------------------------------------------------
 
-echo "👉 Initialize Kafka topics (running kafka-init)..."
-docker-compose build kafka-init
-docker-compose up kafka-init
+# echo "👉 Initialize Kafka topics (running kafka-init)..."
+# docker-compose build kafka-init
+# docker-compose up kafka-init
 
-# Optional: remove kafka-init container after done
-docker rm -f kafka-init || true
+# # Optional: remove kafka-init container after done
+# docker rm -f kafka-init || true
 
-echo "✅ Kafka topics created!"
+# echo "✅ Kafka topics created!"
 
 # --------------------------------------------------
 

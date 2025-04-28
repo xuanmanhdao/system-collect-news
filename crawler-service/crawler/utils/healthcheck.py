@@ -8,7 +8,7 @@ def wait_for_kafka(max_retries=10, wait_time=3):
         try:
             producer = KafkaProducer(bootstrap_servers=[f"{KAFKA_HOST}:{KAFKA_PORT}"])
             producer.close()
-            print("✅ Kafka is available!")
+            print("✅    Kafka is available!")
             break
         except Exception as e:
             print(f"[KAFKA] Attempt {attempt}/{max_retries} - Kafka not available. Retrying in {wait_time}s...")
@@ -21,7 +21,7 @@ def wait_for_redis(max_retries=10, wait_time=3):
         try:
             client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
             client.ping()
-            print("✅ Redis is available!")
+            print("✅     Redis is available!")
             break
         except Exception as e:
             print(f"[REDIS] Attempt {attempt}/{max_retries} - Redis not available. Retrying in {wait_time}s...")

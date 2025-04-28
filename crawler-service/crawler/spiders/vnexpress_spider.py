@@ -1,25 +1,30 @@
 import scrapy
 import hashlib
 from crawler.utils.redis_client import RedisClient
-from crawler.utils.kafka_producer import send_to_kafka
+from crawler.utils.kafka_producer import send_to_kafka, KafkaProducerSingleton
 import logging
+import time
 
 class VnexpressSpider(scrapy.Spider):
     name = "vnexpress"
     allowed_domains = ["vnexpress.net"]
     start_urls = ["https://vnexpress.net"]
     custom_settings = {
-        'LOG_LEVEL': 'DEBUG',  # Bật debug log
-        'CONCURRENT_REQUESTS': 16,  # Giới hạn request đồng thời
-        'DOWNLOAD_DELAY': 1,  # Delay để tránh tải nặng server
-        'RETRY_TIMES': 3,  # Retry request thất bại
+        'LOG_LEVEL': 'DEBUG', # Bật debug log
+        'CONCURRENT_REQUESTS': 16, # Giới hạn request đồng thời
+        'DOWNLOAD_DELAY': 1, # Thêm delay để tránh tải nặng server
+        'RETRY_TIMES': 3, # Retry request thất bại
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.redis = RedisClient()  # Khởi tạo Redis một lần
+        self.redis = RedisClient()
         self.logger.debug("[REDIS] Redis client initialized")
+        # Khởi tạo KafkaProducer sớm để kiểm tra kết nối và tạo topic raw-news
+        # Có thể bỏ nếu topic đã tồn tại và Kafka luôn khả dụng
+        KafkaProducerSingleton.get_producer(topic="raw-news")
+        self.logger.debug("[KAFKA] KafkaProducer initialized")
 
     def parse(self, response):
         """Parse trang chủ để lấy liên kết bài viết."""
@@ -31,6 +36,7 @@ class VnexpressSpider(scrapy.Spider):
 
     def parse_article(self, response):
         try:
+            start_time = time.time()
             # Trích xuất dữ liệu
             title = response.xpath('//h1/text()').get(default='').strip()
             paragraphs = response.xpath('//article//p//text()').getall()
@@ -49,7 +55,7 @@ class VnexpressSpider(scrapy.Spider):
             self.logger.debug(f"[REDIS] Checking hash {hash_key} for {response.url}")
             if not self.redis.exists(hash_key):
                 self.logger.debug(f"[REDIS] Article not in Redis, adding {hash_key}")
-                self.redis.set(hash_key, "1", ex=60*60*24*30)  # Lưu 30 ngày
+                self.redis.set(hash_key, "1", ex=60*60*24*30) # Lưu 30 ngày
 
                 # Chuẩn bị dữ liệu gửi Kafka
                 article_data = {
@@ -65,6 +71,8 @@ class VnexpressSpider(scrapy.Spider):
                 send_to_kafka(
                     "raw-news",
                     article_data,
+                    num_partitions=3,  # Tăng partition
+                    replication_factor=1,
                     callback=lambda rm: self.logger.info(
                         f"[KAFKA] Sent to raw-news: topic={rm.topic}, partition={rm.partition}, offset={rm.offset}, url={response.url}"
                     ),
@@ -74,12 +82,16 @@ class VnexpressSpider(scrapy.Spider):
                 )
             else:
                 self.logger.debug(f"[REDIS] Skipping duplicate article: {response.url}")
-
+            self.logger.info(f"[SPIDER] Processed article {response.url} in {time.time() - start_time:.3f}s")
         except Exception as e:
             self.logger.error(f"[SPIDER] Failed to process article {response.url}: {e}", exc_info=True)
             raise
 
-    # def closed(self, reason):
-    #     """Đóng Redis client khi spider dừng."""
-    #     self.redis.close()
-    #     self.logger.debug("[REDIS] Redis client closed")
+    def closed(self, reason):
+        try:
+            self.redis.disconnect()
+            self.logger.debug("[REDIS] Redis connection closed")
+            KafkaProducerSingleton.close_producer()
+            self.logger.debug("[KAFKA] KafkaProducer closed")
+        except Exception as e:
+            self.logger.error(f"[SPIDER] Error during close: {e}", exc_info=True)

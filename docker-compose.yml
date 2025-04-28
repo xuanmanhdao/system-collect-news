@@ -26,7 +26,7 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9093
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - ALLOW_PLAINTEXT_LISTENER=yes
@@ -40,17 +40,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'  # Tăng CPU
+          memory: 2G  # Tăng RAM
 
   # 3. Kafka init (tạo topic)
-  kafka-init:
-    image: bitnami/kafka:3.4.0-debian-11-r0
-    container_name: kafka-init
-    depends_on:
-      kafka:
-        condition: service_healthy
-    volumes:
-      - ./init-kafka.sh:/app/init-kafka.sh
-    entrypoint: ["/bin/bash", "-c", "/app/init-kafka.sh"]
+  # kafka-init:
+  #   image: bitnami/kafka:3.4.0-debian-11-r0
+  #   container_name: kafka-init
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./init-kafka.sh:/app/init-kafka.sh
+  #   entrypoint: ["/bin/bash", "-c", "/app/init-kafka.sh"]
 
   # 4. Kafdrop (UI xem Kafka)
   kafdrop:
@@ -75,6 +80,11 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
 
   # 6. Elasticsearch
   elasticsearch:
