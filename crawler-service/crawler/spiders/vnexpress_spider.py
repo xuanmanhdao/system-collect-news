@@ -16,7 +16,7 @@ class VnexpressSpider(scrapy.Spider):
         self.logger.debug("[REDIS] Redis client initialized")
         # Khởi tạo KafkaProducer sớm để kiểm tra kết nối và tạo topic raw-news
         # Có thể bỏ nếu topic đã tồn tại và Kafka luôn khả dụng
-        KafkaProducerSingleton.get_producer(topic="raw-news")
+        KafkaProducerSingleton.get_producer(topic="raw-news", num_partitions=3, replication_factor=1)
         self.logger.debug("[KAFKA] KafkaProducer initialized")
 
     def parse(self, response):
@@ -64,9 +64,12 @@ class VnexpressSpider(scrapy.Spider):
 
                 # Gửi bất đồng bộ tới Kafka
                 self.logger.debug(f"[SPIDER] Sending article to Kafka: {response.url}")
+                # Dùng URL + timestamp làm key để phân phối
+                message_key = (response.url + str(time.time())).encode('utf-8')
                 send_to_kafka(
                     "raw-news",
                     article_data,
+                    key=message_key,
                     num_partitions=3,  # Tăng partition
                     replication_factor=1,
                     callback=lambda rm: self.logger.info(

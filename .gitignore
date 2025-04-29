@@ -32,3 +32,6 @@ docker-compose.override.yml
 # Ignore system files
 .DS_Store
 Thumbs.db
+
+# Ignore log
+logs/

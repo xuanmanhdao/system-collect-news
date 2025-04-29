@@ -150,7 +150,8 @@ services:
         condition: service_healthy
     volumes:
       - ./crawler-service:/app
-    command: python main.py
+      - ./crawler-service/logs:/var/log
+    command: cron -f  # Update: start cron thay vì python main.py
 
 volumes:
   esdata:

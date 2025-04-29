@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  kafka:
+    env_file:
+      - .env.dev
+  redis:
+    env_file:
+      - .env.dev
+  crawler:
+    env_file:
+      - .env.dev
+  spark:
+    env_file:
+      - .env.dev
+  elasticsearch:
+    env_file:
+      - .env.dev
+  kafdrop:
+    env_file:
+      - .env.dev
+  kibana:
+    env_file:
+      - .env.dev

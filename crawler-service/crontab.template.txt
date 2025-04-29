@@ -1,0 +1,7 @@
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Crawl VnExpress mỗi phút
+* * * * * cd /app && python3 main.py vnexpress 2>&1 | tee -a /var/log/crawler/vnexpress_${LOG_TIMESTAMP}.log
+
+# Crawl Tuổi Trẻ mỗi phút
+* * * * * cd /app && python3 main.py tuoitre 2>&1 | tee -a /var/log/crawler/tuoitre_${LOG_TIMESTAMP}.log

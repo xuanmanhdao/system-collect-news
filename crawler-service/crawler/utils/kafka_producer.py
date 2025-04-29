@@ -32,7 +32,7 @@ class KafkaProducerSingleton:
                         acks='all',
                         linger_ms=50,
                         batch_size=131072,
-                        max_request_size=4194304
+                        max_request_size=2097152
                     )
                     logger.info(f"[KAFKA] KafkaProducer connected to {KAFKA_HOST}:{KAFKA_PORT}")
 
@@ -115,7 +115,7 @@ class KafkaProducerSingleton:
             cls._producer = None
             cls._checked_topics.clear()
 
-def send_to_kafka(topic, data, callback=None, error_callback=None, num_partitions=1, replication_factor=1):
+def send_to_kafka(topic, data, key=None, callback=None, error_callback=None, num_partitions=1, replication_factor=1):
     """Gửi message tới Kafka topic bất đồng bộ."""
     try:
         message_size = len(json.dumps(data).encode('utf-8'))
@@ -124,7 +124,7 @@ def send_to_kafka(topic, data, callback=None, error_callback=None, num_partition
         # Lấy producer và kiểm tra topic nếu cần
         producer = KafkaProducerSingleton.get_producer(topic=topic, num_partitions=num_partitions, replication_factor=replication_factor)
         start_time = time.time()
-        future = producer.send(topic, data)
+        future = producer.send(topic, key=key, value=data)
         if callback or error_callback:
             future.add_callback(callback or (lambda rm: logger.debug(f"[KAFKA] Sent to {topic}: {rm}")))
             future.add_errback(error_callback or (lambda exc: logger.error(f"[KAFKA] Error sending to {topic}: {exc}", exc_info=True)))
