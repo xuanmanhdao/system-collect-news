@@ -1,50 +1,28 @@
 #!/bin/bash
 set -e
 
-echo "👉 Build and start Zookeeper (Prod)..."
-docker-compose -f docker-compose.yml build zookeeper
-docker-compose -f docker-compose.yml up -d zookeeper
+echo "🚀 [START] Building and starting services for PROD..."
 
-echo "⏳ Waiting for Zookeeper to be healthy..."
-until [ "$(docker inspect --format='{{.State.Health.Status}}' zookeeper)" == "healthy" ]; do
-  sleep 2
+# Bước 1: Build tất cả các service
+docker-compose -f docker-compose.yml build
+
+# Bước 2: Start tuần tự Zookeeper -> Kafka -> Redis -> Kafdrop -> Elasticsearch -> Kibana -> Spark -> Crawler
+services=(zookeeper kafka redis kafdrop elasticsearch kibana spark crawler)
+
+for service in "${services[@]}"; do
+  echo "👉 Starting $service..."
+  docker-compose -f docker-compose.yml up -d $service
+
+  # Nếu có healthcheck thì đợi healthy
+  if docker inspect --format='{{.State.Health.Status}}' $service &>/dev/null; then
+    echo "⏳ Waiting for $service to be healthy..."
+    until [ "$(docker inspect --format='{{.State.Health.Status}}' $service)" == "healthy" ]; do
+      sleep 2
+    done
+    echo "✅ $service is healthy!"
+  else
+    echo "⚡ $service does not have healthcheck. Continue..."
+  fi
 done
-echo "✅ Zookeeper is healthy!"
 
-# --------------------------------------------------
-
-echo "👉 Build and start Kafka (Prod)..."
-docker-compose -f docker-compose.yml build kafka
-docker-compose -f docker-compose.yml up -d kafka
-
-echo "⏳ Waiting for Kafka to be healthy..."
-until [ "$(docker inspect --format='{{.State.Health.Status}}' kafka)" == "healthy" ]; do
-  sleep 2
-done
-echo "✅ Kafka is healthy!"
-
-# --------------------------------------------------
-
-echo "👉 Build and start Redis (Prod)..."
-docker-compose -f docker-compose.yml build redis
-docker-compose -f docker-compose.yml up -d redis
-
-echo "⏳ Waiting for Redis to be healthy..."
-until [ "$(docker inspect --format='{{.State.Health.Status}}' redis)" == "healthy" ]; do
-  sleep 2
-done
-echo "✅ Redis is healthy!"
-
-# --------------------------------------------------
-
-echo "👉 Build and start Kafdrop (Prod)..."
-docker-compose -f docker-compose.yml build kafdrop
-docker-compose -f docker-compose.yml up -d kafdrop
-
-# --------------------------------------------------
-
-echo "👉 Build and start Crawler (Prod)..."
-docker-compose -f docker-compose.yml build crawler
-docker-compose -f docker-compose.yml up -d crawler
-
-echo "✅ All containers for Production environment are built and started!"
+echo "🎯 [DONE] All PROD services built and started successfully!"
