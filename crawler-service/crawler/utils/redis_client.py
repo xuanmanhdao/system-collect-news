@@ -4,7 +4,7 @@ import redis
 from redis.exceptions import ConnectionError, AuthenticationError, TimeoutError
 from crawler.utils.config import REDIS_HOST, REDIS_PORT, MAX_RETRIES, RETRY_DELAY_SECONDS
 
-# Thiết lập logging
+# # Thiết lập logging
 logger = logging.getLogger(__name__)
 
 class RedisClient:

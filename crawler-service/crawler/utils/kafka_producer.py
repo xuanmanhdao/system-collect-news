@@ -6,13 +6,13 @@ from kafka.errors import NoBrokersAvailable, KafkaTimeoutError, KafkaError, Topi
 from kafka.admin import NewTopic
 from crawler.utils.config import KAFKA_HOST, KAFKA_PORT, MAX_RETRIES, RETRY_DELAY_SECONDS
 
-# Thiết lập logging
-logging.basicConfig(level=logging.INFO)
+# # Thiết lập logging
+# logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Tắt log DEBUG của kafka.conn
-logging.getLogger('kafka.conn').setLevel(logging.INFO)
-logging.getLogger('kafka.protocol.parser').setLevel(logging.INFO)
+# # Tắt log DEBUG của kafka.conn
+# logging.getLogger('kafka.conn').setLevel(logging.INFO)
+# logging.getLogger('kafka.protocol.parser').setLevel(logging.INFO)
 
 class KafkaProducerSingleton:
     _producer = None

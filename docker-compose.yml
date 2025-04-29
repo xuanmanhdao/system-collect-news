@@ -69,6 +69,11 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 5. Redis
   redis:
@@ -117,6 +122,11 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 8. Spark
   spark:
@@ -131,12 +141,16 @@ services:
         condition: service_healthy
     volumes:
       - ./processor-service:/opt/spark-apps
-    command: >
-      bash -c "
-        /opt/bitnami/spark/bin/spark-submit \
-        --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3,org.elasticsearch:elasticsearch-spark-30_2.12:8.11.1 \
-        /opt/spark-apps/spark_news_processor.py
-      "
+    command:
+      - /opt/bitnami/spark/bin/spark-submit
+      - --packages
+      - org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.3,org.elasticsearch:elasticsearch-spark-30_2.12:8.11.1
+      - /opt/spark-apps/spark_news_processor.py
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 7077 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 9. Crawler
   crawler:
@@ -152,6 +166,11 @@ services:
       - ./crawler-service:/app
       - ./crawler-service/logs:/var/log
     command: cron -f  # Update: start cron thay vì python main.py
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep cron || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   esdata:
