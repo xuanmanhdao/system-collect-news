@@ -3,7 +3,7 @@
 # --- Cấu hình các tham số ---
 KAFKA_BROKER=${KAFKA_BROKER:-kafka:9092}   # Broker nội bộ docker
 TOPIC_NAME=${TOPIC_NAME:-raw-news}         # Tên topic cần tạo
-PARTITIONS=${PARTITIONS:-1}                # Số partition
+PARTITIONS=${PARTITIONS:-3}                # Số partition
 REPLICATION_FACTOR=${REPLICATION_FACTOR:-1} # Số replication factor
 
 # --- Hàm tạo topic ---

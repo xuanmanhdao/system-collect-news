@@ -10,7 +10,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Cài cron và công cụ cần thiết
-RUN apt-get update && apt-get install -y iputils-ping cron coreutils gettext-base
+RUN apt-get update && apt-get install -y iputils-ping cron coreutils gettext-base procps
 
 # Copy crontab template
 COPY crontab.template.txt /app/crontab.template.txt

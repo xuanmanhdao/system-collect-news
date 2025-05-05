@@ -56,7 +56,7 @@ try:
         .option("checkpointLocation", "/tmp/checkpoint-es") \
         .option("es.nodes", "elasticsearch") \
         .option("es.port", "9200") \
-        .option("es.resource", "news/_doc") \
+        .option("es.resource", "news") \
         .option("es.nodes.wan.only", "false") \
         .option("es.mapping.id", "url") \
         .start()

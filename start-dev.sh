@@ -7,7 +7,7 @@ echo "🚀 [START] Building and starting services for DEV..."
 docker-compose -f docker-compose.yml -f docker-compose.override.yml build
 
 # Bước 2: Start tuần tự Zookeeper -> Kafka -> Redis -> Kafdrop -> Elasticsearch -> Kibana -> Spark -> Crawler
-services=(zookeeper kafka redis kafdrop elasticsearch kibana spark crawler)
+services=(zookeeper kafka kafka-init redis kafdrop elasticsearch kibana spark crawler)
 
 for service in "${services[@]}"; do
   echo "👉 Starting $service..."
